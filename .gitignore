@@ -1,21 +1,26 @@
-# Ignore the Next.js app directory
-/app/
-
-# Ignore node_modules
+# Ignore node_modules folder (for both the app and server)
 node_modules/
 
-# Ignore build artifacts for the server (optional, if you have any build process for the server)
-server/build/
+# Ignore build directories for Next.js (you don't want to push these)
+.next/
+out/
 
-# Ignore logs and temporary files
-*.log
-*.tmp
-
-# Ignore environment files (to keep sensitive data safe)
+# Ignore environment variables (sensitive data)
 .env
 .env.local
-.env.*.local
+.env.development
+.env.production
+.env.test
 
-# Ignore other OS-specific files
+# Ignore log files
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Ignore operating system specific files (macOS, Windows, etc.)
 .DS_Store
-Thumbs.db
+
+# Ignore IDE/editor-specific files
+.vscode/
+.idea/
+*.swp
