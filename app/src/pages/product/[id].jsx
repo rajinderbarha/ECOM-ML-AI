@@ -3,7 +3,7 @@ import React from 'react'
 
 export default function index() {
   return (
-    <div className='flex flex-col min-h-screen  mx-auto mt-20 '>
+    <div className='flex flex-col min-h-screen  mx-auto  '>
       <ProductDetail />
     </div>
   )

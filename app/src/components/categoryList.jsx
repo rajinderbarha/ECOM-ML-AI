@@ -28,7 +28,7 @@ export default function CategoryList() {
     return (
         <div className="w-full bg-gray-100 py-4">
             <h2 className="text-lg font-bold px-4 mb-2">Shop by Category</h2>
-            <div className="flex overflow-x-auto space-x-4 px-4 hide-scrollbar">
+            <div className="flex overflow-x-auto py-[10px] space-x-4 px-4 category-list-scroll">
                 {categories.map((category) => (
                     <div
                         key={category._id}
@@ -48,7 +48,7 @@ export default function CategoryList() {
                                 <span className="text-gray-500">No Image</span>
                             </div>
                         )}
-                        <span className="text-sm font-semibold text-gray-700 mt-2">{category.name}</span>
+                        <span className="text-sm font-semibold text-gray-700 mt-2 category-list-text">{category.name}</span>
                     </div>
                 ))}
             </div>
