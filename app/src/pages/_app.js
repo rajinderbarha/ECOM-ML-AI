@@ -7,6 +7,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import GlobalLoader from "@/components/GlobalLoader";
 import Footer from "@/components/Footer";
+import NewsLetter from "@/components/NewsLetter";
 
 export default function App({ Component, pageProps: { session, ...pageProps } }) {
   const [loading, setLoading] = useState(false);
@@ -39,6 +40,7 @@ export default function App({ Component, pageProps: { session, ...pageProps } })
             {loading && <GlobalLoader />}
             <Component {...pageProps} />
           </main>
+          <NewsLetter/>
           <Footer />
         </div>
       </AppProvider>

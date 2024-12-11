@@ -3,6 +3,7 @@ import CategoryList from "@/components/categoryList";
 import CategoryNameList from "@/components/CategoryNameList";
 import HeroSection from "@/components/HeroSection";
 import ProductList from "@/components/productList";
+import NewsLetter from "@/components/NewsLetter";
 import { useSession } from "next-auth/react";
 
 const Home = () => {
@@ -14,6 +15,7 @@ const Home = () => {
       <HeroSection />
       <CategoryList />
       <ProductList />
+      {/* <NewsLetter/> */}
     </div>
   );
 };
