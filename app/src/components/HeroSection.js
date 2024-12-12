@@ -8,25 +8,33 @@ const HeroSection = () => {
             image: '/images/vegitables.png',
             title: 'Fresh Veggies & Fruits',
             description: 'Get farm-fresh fruits and vegetables delivered to your door.',
-            link: '/categories/fresh-veggies-fruits',
+            link: `/shop-by-category?categories=${encodeURIComponent(
+                "Fresh Fruits|Fresh Vegitables"
+            )}`,
         },
         {
             image: '/images/household.png',
             title: 'Household Essentials',
             description: 'Stock up on everything you need for a happy home.',
-            link: '/categories/household',
+            link: `/shop-by-category?categories=${encodeURIComponent(
+                "Masala|Food Grains & Oil|Bath & Hand Wash|Milk & Eggs|Hair & Skin Care|House Hold|Kitchen & Garden"
+            )}`,
         },
         {
             image: '/images/cloths.png',
             title: 'Clothing & Garments',
             description: 'Find your style with our latest clothing collections.',
-            link: '/categories/clothing',
+            link: `/shop-by-category?categories=${encodeURIComponent(
+                "Men's Apparel|Women's Apparel|Kid's Apparel"
+            )}`,
         },
         {
             image: '/images/snacks.png',
             title: 'Delicious Snacks',
             description: 'Satisfy your cravings with our range of tasty snacks.',
-            link: '/categories/snacks',
+            link: `/shop-by-category?categories=${encodeURIComponent(
+                "Bakery Snacks|Bread & Buns|Cakes|Beverages|Biscuits & Cookies|Snacks & Namkeens"
+            )}`,
         },
     ];
 

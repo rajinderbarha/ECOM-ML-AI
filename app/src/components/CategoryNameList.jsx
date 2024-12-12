@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { GoChevronLeft, GoChevronRight  } from "react-icons/go";
+import { useRouter } from 'next/router';
 export default function CategoryNameList() {
     const [categories, setCategories] = useState([]);
     const scrolingContent = useRef();
     const leftBtn = useRef();
     const rightBtn = useRef();
     const scrolingContentElemet= scrolingContent.current
-
+    const router = useRouter();
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -35,14 +36,21 @@ export default function CategoryNameList() {
     const handleMouseEnter = () => {
         leftBtn.current.style.opacity = 1;
         rightBtn.current.style.opacity = 1;
-        console.log("mouse enter");
+        // console.log("mouse enter");
         
     };
     const handleMouseLeave = () => {
         leftBtn.current.style.opacity = 0;
         rightBtn.current.style.opacity = 0;
-        console.log("mouse leave");
+        // console.log("mouse leave");
         
+    };
+
+    const handleCategoryClick = (category) => {
+        console.log(category);
+        router.push(`/shop-by-category?categories=${encodeURIComponent(
+            category?.name
+        )}`,);
     };
 
     return (
@@ -58,6 +66,7 @@ export default function CategoryNameList() {
                     <div
                     key={category._id}
                     className="flex-none bg-white shadow-md rounded-lg p-3 min-w-[120px] text-center cursor-pointer hover:bg-gray-200 transition"
+                    onClick={() => handleCategoryClick(category)}
                     >
                         <span className="text-sm font-semibold text-gray-700 category-name-list-text">{category.name}</span>
                     </div>

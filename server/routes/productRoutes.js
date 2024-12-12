@@ -1,27 +1,28 @@
 import { Router } from "express";
+import qs from 'qs';
 import Category from "../models/Category.js";
-import   uploader from '../utils/cloudinary.js';
+import uploader from '../utils/cloudinary.js';
 import Product from "../models/Product.js";
 
 const router = Router();
 
 router.get('/getCategoryNames', async (req, res) => {
     try {
-        const CategoryNameList = await Category.find({}, 'name'); 
+        const CategoryNameList = await Category.find({}, 'name');
         // console.log(CategoryNameList); 
-        res.status(200).json(CategoryNameList); 
+        res.status(200).json(CategoryNameList);
     } catch (error) {
-        console.error('Error fetching category names:', error); 
+        console.error('Error fetching category names:', error);
         res.status(500).json({ message: 'Error fetching category names', error });
     }
 });
 router.get('/getCategories', async (req, res) => {
     try {
-        const CategoryList = await Category.find({}); 
+        const CategoryList = await Category.find({});
         // console.log(CategoryList); 
-        res.status(200).json(CategoryList); 
+        res.status(200).json(CategoryList);
     } catch (error) {
-        console.error('Error fetching categories :', error); 
+        console.error('Error fetching categories :', error);
         res.status(500).json({ message: 'Error fetching category names', error });
     }
 });
@@ -57,6 +58,34 @@ router.get("/categories", async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
+
+
+router.get('/products-by-category', async (req, res) => {
+    try {
+        const parsedQuery = qs.parse(req.query, { ignoreQueryPrefix: true });
+        const categories = parsedQuery.categories;
+          console.log("categories",categories);
+        if (!categories) {
+            return res.status(400).json({ error: "Categories parameter is required" });
+        }
+
+        const decodedCategories = decodeURIComponent(categories)
+            .split('|') // Keep existing delimiter
+            .map((cat) => cat.trim());
+
+        console.log("Decoded categories:", decodedCategories);
+
+        const products = await Product.find({ categoryName: { $in: decodedCategories } });
+
+        res.status(200).json(products);
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).json({ error: "Failed to fetch products by category" });
+    }
+});
+
+
+
 
 // Add a new product
 router.post('/add-product', uploader.array('images', 5), async (req, res) => {

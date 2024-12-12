@@ -19,11 +19,13 @@ const ProductSchema = new Schema({
     usageFrequency: {
         type: String,
         enum: ['daily', 'weekly', 'monthly'],
-        required: true
+        required: true,
     },
-
-},
+}, 
     { timestamps: true }
 );
+
+// Adding a text index for searchable fields
+ProductSchema.index({ name: 'text', description: 'text', brand: 'text', categoryName: 'text' });
 
 export default model('Product', ProductSchema);

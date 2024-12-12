@@ -22,12 +22,15 @@ export default function CategoryList() {
     }, []);
 
     const handleCategoryClick = (category) => {
-        router.push(`/shop/category/${category._id}`);
+        console.log(category);
+        router.push(`/shop-by-category?categories=${encodeURIComponent(
+            category?.name
+        )}`,);
     };
 
     return (
         <div className="w-full bg-gray-100 py-4">
-            <h2 className="text-lg font-bold px-4 mb-2">Shop by Category</h2>
+            <h2 className="text-lg font-bold px-4 mb-2 ps-4">Shop by Category</h2>
             <div className="flex overflow-x-auto py-[10px] space-x-4 px-4 category-list-scroll">
                 {categories.map((category) => (
                     <div
