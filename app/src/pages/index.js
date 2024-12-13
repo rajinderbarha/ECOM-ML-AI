@@ -8,6 +8,8 @@ import { useSession } from "next-auth/react";
 import DiscountSection from "@/components/DiscountSection";
 import { useEffect, useState } from "react";
 import ProductUnderPriceSection from "@/components/ProductUnderPriceSection";
+import ProductRecentViewed from "@/components/ProductRecentViewed";
+import ProductRelatedSearch from "@/components/ProductRelatedSearch";
 
 const Home = () => {
   const { data: session } = useSession();
@@ -16,8 +18,8 @@ const Home = () => {
       <CategoryNameList />
       <HeroSection />
       <CategoryList />
-      {session ? "Products Realted to you search. Will be created soon": ""}<br />
-      {session ? "Products you have recently viewed. Will be created soon": ""}
+      {session ? <ProductRelatedSearch />: ""}
+      {session ? <ProductRecentViewed />: ""}
       <DiscountSection/>
       <ProductUnderPriceSection />
       <ProductList />

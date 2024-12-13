@@ -110,7 +110,7 @@ router.get('/discount-products', async (req, res) => {
         const shuffledProducts = filteredProducts.sort(() => Math.random() - 0.5);
 
         // Limit the shuffled products to 8
-        const limitedProducts = shuffledProducts.slice(0, 8);
+        const limitedProducts = shuffledProducts.slice(0, 10);
 
         res.json(limitedProducts);
     } catch (err) {
@@ -135,7 +135,7 @@ router.get('/products-under-price', async (req, res) => {
         const shuffledProducts = products.sort(() => Math.random() - 0.5);
 
         // Limit to 8 products per price range
-        const limitedProducts = shuffledProducts.slice(0, 8);
+        const limitedProducts = shuffledProducts.slice(0, 10);
 
         res.json(limitedProducts);
     } catch (err) {

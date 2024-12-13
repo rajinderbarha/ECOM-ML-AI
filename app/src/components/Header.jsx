@@ -13,11 +13,11 @@ const Header = () => {
   const [isCartModalOpen, setCartModalOpen] = useState(false);
   const [isWishlistModalOpen, setWishlistModalOpen] = useState(false);
   const router = useRouter();
-  const {searchQuery, setSearchQuery} = useAppContext();
+  const { searchQuery, setSearchQuery } = useAppContext();
   const handleSearch = (e) => {
     e.preventDefault();
     router.push('/search-page?search=' + searchQuery);
-    
+
   };
   const clearSearch = () => setSearchQuery("");
   return (
@@ -29,14 +29,14 @@ const Header = () => {
             ECOM-ML-AI
           </Link>
         </div>
-        <form onSubmit={handleSearch} className=" items-center justify-center xl:ms-32 lg:mx-10 md:mx-5 max-w-[670px] flex-grow mx-4 relative sm:flex hidden">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search products..."
-            className="w-full max-w-[670px] px-4 py-2 rounded-md text-gray-800"
-          />
+        <div className=" items-center justify-center xl:ms-32 lg:mx-10 md:mx-5 max-w-[670px] flex-grow mx-4 relative sm:flex hidden">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search products..."
+              className="w-full max-w-[670px] px-4 py-2 rounded-md text-gray-800"
+            />
           {/* Clear Icon */}
           {searchQuery && (
             <button
@@ -52,9 +52,9 @@ const Header = () => {
           >
             <FiSearch className="text-xl" />
           </button>
-        </form>
+        </div>
         <div className=" items-center justify-center xl:ms-32 lg:mx-10 md:mx-5 max-w-[670px] flex-grow mx-4 relative sm:hidden flex">
-        <button
+          <button
             onClick={handleSearch}
             className="absolute right-2 text-white hover:text-white/80"
           >
@@ -75,7 +75,7 @@ const Header = () => {
           {/* Account */}
           <div className="relative">
             <button className="flex items-center gap-2 " onClick={() => setAccountDropdownOpen(!isAccountDropdownOpen)}>
-             <span className="hidden md:inline"> {session ? session.user.name : ""}</span> {session ? <img src={session ? session.user.image : ""} alt="User" className="w-8 h-8 rounded-full" /> : <FiUser className="text-xl" />}
+              <span className="hidden md:inline"> {session ? session.user.name : ""}</span> {session ? <img src={session ? session.user.image : ""} alt="User" className="w-8 h-8 rounded-full" /> : <FiUser className="text-xl" />}
             </button>
             {isAccountDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg py-2 z-10">

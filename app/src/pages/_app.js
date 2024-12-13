@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/components/Header.jsx";
 import { AppProvider } from "@/contexts/AppContext";
 import "@/styles/globals.css";
 import { useEffect, useState } from "react";

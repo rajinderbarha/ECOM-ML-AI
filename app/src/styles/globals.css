@@ -45,10 +45,6 @@ body {
     display: none; /* Chrome, Safari, and Opera */
 }
 
-
-
-
-
 .scroll-btn{
   position: absolute;
   top: 0;
@@ -66,18 +62,40 @@ body {
   right: 0;
 }
 
+@property --var1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+.category-list-scroll{
+  transition: --var1 .5s;
+}
+@media ( hover: hover ) and (pointer:fine){
+
+  .category-list-scroll:hover {
+    --var1: #b9b9ba;
+  }
+}
 
 
 .category-list-scroll::-webkit-scrollbar {
   width: 8px;
   height: 8px; 
+  /* opacity: 0; */
 }
 
 .category-list-scroll::-webkit-scrollbar-thumb {
-  background: #b9b9ba;
+  /* background: transparent; */
+  background:  var(--var1);;
   border-radius: 8px;
   transition: all 1s ease;
+
 }
+/* .category-list-scroll:hover::-webkit-scrollbar-thumb {
+  background: #b9b9ba;
+  transition: all 1s ease;
+} */
 
 .category-list-scroll::-webkit-scrollbar-thumb:hover {
   background: #a1a0a0;
@@ -98,4 +116,14 @@ p, input, textarea, select, li, .category-name-list-text, .category-list-text{
 button, .product-list-price-text{
   font-family: "Nunito", sans-serif;
 
+}
+
+
+@media (min-width:1562px){
+  .scroll-left-btn{
+    left: -29px;
+  }
+  .scroll-right-btn{
+    right: -29px;
+  }
 }
