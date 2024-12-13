@@ -6,7 +6,7 @@ const HeroSection = () => {
     const slides = [
         {
             image: '/images/vegitables.png',
-            title: 'Fresh Veggies & Fruits',
+            title: 'Fresh Veggies and Fruits',
             description: 'Get farm-fresh fruits and vegetables delivered to your door.',
             link: `/shop-by-category?categories=${encodeURIComponent(
                 "Fresh Fruits|Fresh Vegitables"
@@ -17,12 +17,12 @@ const HeroSection = () => {
             title: 'Household Essentials',
             description: 'Stock up on everything you need for a happy home.',
             link: `/shop-by-category?categories=${encodeURIComponent(
-                "Masala|Food Grains & Oil|Bath & Hand Wash|Milk & Eggs|Hair & Skin Care|House Hold|Kitchen & Garden"
+                "Masala|Food Grains and Oil|Bath and Hand Wash|Milk and Eggs|Hair and Skin Care|House Hold|Kitchen and Garden"
             )}`,
         },
         {
             image: '/images/cloths.png',
-            title: 'Clothing & Garments',
+            title: 'Clothing and Garments',
             description: 'Find your style with our latest clothing collections.',
             link: `/shop-by-category?categories=${encodeURIComponent(
                 "Men's Apparel|Women's Apparel|Kid's Apparel"
@@ -33,7 +33,7 @@ const HeroSection = () => {
             title: 'Delicious Snacks',
             description: 'Satisfy your cravings with our range of tasty snacks.',
             link: `/shop-by-category?categories=${encodeURIComponent(
-                "Bakery Snacks|Bread & Buns|Cakes|Beverages|Biscuits & Cookies|Snacks & Namkeens"
+                "Bakery Snacks|Bread and Buns|Cakes|Beverages|Biscuits and Cookies|Snacks and Namkeens"
             )}`,
         },
     ];

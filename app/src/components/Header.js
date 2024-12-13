@@ -1,24 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { FiSearch, FiShoppingCart, FiHeart, FiUser, FiX } from "react-icons/fi";
+import Cart from "./Cart";
+import WishList from "./WishList";
+import { useAppContext } from "@/contexts/AppContext";
+import { useRouter } from "next/router";
 
 const Header = () => {
   const { data: session } = useSession();
   const [isAccountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [isCartModalOpen, setCartModalOpen] = useState(false);
   const [isWishlistModalOpen, setWishlistModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery);
-      // Add search logic here (e.g., API call, navigation)
-    }
+  const router = useRouter();
+  const {searchQuery, setSearchQuery} = useAppContext();
+  const handleSearch = (e) => {
+    e.preventDefault();
+    router.push('/search-page?search=' + searchQuery);
+    
   };
-
   const clearSearch = () => setSearchQuery("");
-
   return (
     <header className="bg-gray-800 text-white py-4 px-6 sticky top-0 left-0 w-full z-[1000]">
       <nav className="flex justify-between items-center">
@@ -28,9 +29,7 @@ const Header = () => {
             ECOM-ML-AI
           </Link>
         </div>
-
-        {/* Search */}
-        <div className=" items-center justify-center xl:ms-32 lg:mx-10 md:mx-5 max-w-[670px] flex-grow mx-4 relative sm:flex hidden">
+        <form onSubmit={handleSearch} className=" items-center justify-center xl:ms-32 lg:mx-10 md:mx-5 max-w-[670px] flex-grow mx-4 relative sm:flex hidden">
           <input
             type="text"
             value={searchQuery}
@@ -47,14 +46,13 @@ const Header = () => {
               <FiX className="text-xl" />
             </button>
           )}
-          {/* Search Icon */}
           <button
             onClick={handleSearch}
             className="absolute right-2 text-gray-500 hover:text-gray-800"
           >
             <FiSearch className="text-xl" />
           </button>
-        </div>
+        </form>
         <div className=" items-center justify-center xl:ms-32 lg:mx-10 md:mx-5 max-w-[670px] flex-grow mx-4 relative sm:hidden flex">
         <button
             onClick={handleSearch}
@@ -65,15 +63,9 @@ const Header = () => {
         </div>
         {/* Icons */}
         <div className="flex items-center gap-6">
-          {/* Wishlist */}
-          <button
-            onClick={() => setWishlistModalOpen(true)}
-            className="relative"
-          >
+          <button onClick={() => setWishlistModalOpen(true)} className="relative">
             <FiHeart className="text-xl" />
           </button>
-
-          {/* Cart */}
           <button onClick={() => setCartModalOpen(true)} className="relative">
             <FiShoppingCart className="text-xl" />
             {/* <p className="card-count absolute top-0 right-0 text-xs bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center">1</p> */}
@@ -82,10 +74,7 @@ const Header = () => {
 
           {/* Account */}
           <div className="relative">
-            <button
-              className="flex items-center gap-2 "
-              onClick={() => setAccountDropdownOpen(!isAccountDropdownOpen)}
-            >
+            <button className="flex items-center gap-2 " onClick={() => setAccountDropdownOpen(!isAccountDropdownOpen)}>
              <span className="hidden md:inline"> {session ? session.user.name : ""}</span> {session ? <img src={session ? session.user.image : ""} alt="User" className="w-8 h-8 rounded-full" /> : <FiUser className="text-xl" />}
             </button>
             {isAccountDropdownOpen && (
@@ -93,18 +82,12 @@ const Header = () => {
                 {session ? (
                   <>
                     <p className="px-4 py-2 truncate">{session.user.email}</p>
-                    <button
-                      className="w-full text-left px-4 py-2 hover:bg-red-500"
-                      onClick={() => signOut()}
-                    >
+                    <button className="w-full text-left px-4 py-2 hover:bg-red-500" onClick={() => signOut()}>
                       Logout
                     </button>
                   </>
                 ) : (
-                  <button
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                    onClick={() => signIn("google")}
-                  >
+                  <button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => signIn("google")}>
                     Login
                   </button>
                 )}
@@ -113,40 +96,13 @@ const Header = () => {
           </div>
         </div>
       </nav>
-
-      {/* Cart Modal */}
       {isCartModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1050]">
-          <div className="bg-white rounded-lg p-4 w-96 z-[1100]">
-            <h2 className="bg-white rounded-lg p-4 w-full z-[1100] text-black">Your Cart</h2>
-            {/* Cart Items items go here */}
-            <button
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-              onClick={() => setCartModalOpen(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <Cart setCartModalOpen={setCartModalOpen} />
       )}
-
-      {/* Wishlist Modal */}
       {isWishlistModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1050]">
-          <div className="bg-white rounded-lg p-4 w-96 z-[1100]">
-            <h2 className="bg-white rounded-lg p-4 w-full z-[1100] text-black">Your Wishlist</h2>
-            {/* Wishlist items go here */}
-            <button
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-              onClick={() => setWishlistModalOpen(false)}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <WishList setWishlistModalOpen={setWishlistModalOpen} />
       )}
     </header>
   );
 };
-
 export default Header;

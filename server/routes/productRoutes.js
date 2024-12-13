@@ -64,7 +64,7 @@ router.get('/products-by-category', async (req, res) => {
     try {
         const parsedQuery = qs.parse(req.query, { ignoreQueryPrefix: true });
         const categories = parsedQuery.categories;
-          console.log("categories",categories);
+        //   console.log("categories",categories);
         if (!categories) {
             return res.status(400).json({ error: "Categories parameter is required" });
         }
@@ -73,7 +73,7 @@ router.get('/products-by-category', async (req, res) => {
             .split('|') // Keep existing delimiter
             .map((cat) => cat.trim());
 
-        console.log("Decoded categories:", decodedCategories);
+        // console.log("Decoded categories:", decodedCategories);
 
         const products = await Product.find({ categoryName: { $in: decodedCategories } });
 
@@ -84,8 +84,87 @@ router.get('/products-by-category', async (req, res) => {
     }
 });
 
+router.get('/discount-products', async (req, res) => {
+    try {
+        const { discount } = req.query;
 
+        // Validate discount value
+        if (!discount || ![20, 50].includes(Number(discount))) {
+            return res.status(400).json({ error: 'Invalid discount value. Use 20 or 50.' });
+        }
 
+        // Fetch products with salePrice less than price
+        const products = await Product.find({
+            $expr: { $lt: ["$salePrice", "$price"] }
+        });
+
+        // Filter products by discount
+        const filteredProducts = products.filter((product) => {
+            const calculatedDiscount = Math.round(
+                ((product.price - product.salePrice) / product.price) * 100
+            );
+            return calculatedDiscount >= Number(discount);
+        });
+
+        // Shuffle the filtered products array
+        const shuffledProducts = filteredProducts.sort(() => Math.random() - 0.5);
+
+        // Limit the shuffled products to 8
+        const limitedProducts = shuffledProducts.slice(0, 8);
+
+        res.json(limitedProducts);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error fetching products.' });
+    }
+});
+
+router.get('/products-under-price', async (req, res) => {
+    try {
+        const { price } = req.query;
+        // if (![500, 1000].includes(Number(price))) {
+        //     return res.status(400).json({ error: 'Invalid price range. Use 500 or 1000.' });
+        // }
+
+        // Find all products where salePrice is less than price
+        const products = await Product.find({
+            salePrice: { $lt: Number(price) }
+        });
+
+        // Shuffle the products
+        const shuffledProducts = products.sort(() => Math.random() - 0.5);
+
+        // Limit to 8 products per price range
+        const limitedProducts = shuffledProducts.slice(0, 8);
+
+        res.json(limitedProducts);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error fetching products.' });
+    }
+});
+
+router.get('/search', async (req, res) => {
+    const { search, category, brand, priceRange, inStock } = req.query;
+    console.log(req.query);
+    const filters = {};
+    if (search) filters.$text = { $search: search };
+    if (category) filters.categoryName = category;
+    if (brand) filters.brand = { $regex: brand, $options: "i" };
+    if (inStock) filters.inStock = inStock === "true";
+    if (priceRange) {
+        const [min, max] = priceRange.split(",").map(Number);
+        filters.price = { $gte: min, $lte: max };
+    }
+
+    try {
+        const products = await Product.find(filters).sort({ createdAt: -1 });
+        res.status(200).json({ products });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch products" });
+    }
+
+})
 
 // Add a new product
 router.post('/add-product', uploader.array('images', 5), async (req, res) => {

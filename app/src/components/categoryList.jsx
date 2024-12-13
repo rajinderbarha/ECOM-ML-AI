@@ -22,7 +22,7 @@ export default function CategoryList() {
     }, []);
 
     const handleCategoryClick = (category) => {
-        console.log(category);
+        // console.log(category);
         router.push(`/shop-by-category?categories=${encodeURIComponent(
             category?.name
         )}`,);
