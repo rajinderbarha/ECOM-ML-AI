@@ -17,7 +17,7 @@ const AddCategory = () => {
         formData.append('image', image);
 
         try {
-            const res = await axios.post('http://localhost:5000/api/categories/add-category', formData);
+            const res = await axios.post('http://localhost:5000/api/add-category', formData);
             console.log(res.data);
             alert('Category added successfully!');
         } catch (error) {

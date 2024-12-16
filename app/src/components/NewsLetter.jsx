@@ -9,7 +9,7 @@ return(
         <span className="title text-[2rem] leading-8 font-bold tracking-tight ">Subscribe to our newsletter.</span>
         <p className="description leading-6 text-base mt-4 text-gray-700">Nostrud amet eu ullamco nisi aute in ad minim nostrud adipisicing velit quis. Duis tempor incididunt dolore.</p>
         <div className="flex max-w-[450px] w-full mt-4 gap-2 sm:flex-row flex-col">
-          <input placeholder="Enter your email" type="email" name="email" id="email-address" className="outline-none leading-6 text-sm text-text-gray-800 px-3.5 py-2 bg-white/5 border border border-text-gray-700 rounded-md flex-1" />
+          <input placeholder="Enter your email" type="email" name="email" id="email-address" className="outline-none leading-6 text-sm text-text-gray-800 px-3.5 py-2 bg-white/5 border  border-text-gray-700 rounded-md flex-1" />
           {/* <button type="submit" className="text-white font-semibold text-sm leading-5 px-3.5 py-2.5 bg-indigo-500 rounded-md border-none outline-none">Subscribe</button> */}
           <button type="submit" className="bg-[#2563eb] hover:bg-blue-700 text-white py-2 px-4 rounded-lg ">Subscribe</button>
         </div>

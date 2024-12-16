@@ -8,14 +8,14 @@ const DiscountSection = () => {
     const [products50, setProducts50] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/products/discount-products?discount=20')
+        fetch('http://localhost:5000/api/discount-products?discount=20')
             .then((res) => res.json())
             .then((data) => (
                 // console.log(data),
                 setProducts20(data)
             ))
 
-        fetch('http://localhost:5000/api/products/discount-products?discount=50')
+        fetch('http://localhost:5000/api/discount-products?discount=50')
             .then((res) => res.json())
             .then((data) => (
                 // console.log(data),

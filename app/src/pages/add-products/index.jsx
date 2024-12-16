@@ -22,7 +22,7 @@ export default function ProductForm() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/categories/categories');
+                const response = await axios.get('http://localhost:5000/api/categories');
                 setCategories(response.data);
                 // console.log(response.data);
             } catch (error) {
@@ -61,7 +61,7 @@ export default function ProductForm() {
         });
 
         try {
-            const response = await axios.post('http://localhost:5000/api/categories/add-product', form, {
+            const response = await axios.post('http://localhost:5000/api/add-product', form, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             alert('Product added successfully!');

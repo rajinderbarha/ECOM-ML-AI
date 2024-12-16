@@ -9,13 +9,13 @@ const ProductUnderPriceSection = () => {
 
     useEffect(() => {
         // Fetch products under 500
-        fetch('http://localhost:5000/api/products/products-under-price?price=500')
+        fetch('http://localhost:5000/api/products-under-price?minPrice=0&maxPrice=500')
             .then(res => res.json())
             .then(data => setProductsUnder500(data))
             .catch(err => console.error('Error fetching products under 500', err));
 
         // Fetch products under 1000
-        fetch('http://localhost:5000/api/products/products-under-price?price=1000')
+        fetch('http://localhost:5000/api/products-under-price?minPrice=500&maxPrice=1000')
             .then(res => res.json())
             .then(data => setProductsUnder1000(data))
             .catch(err => console.error('Error fetching products under 1000', err));

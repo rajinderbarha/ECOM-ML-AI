@@ -175,6 +175,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { useSession } from "next-auth/react";
 
 export default function ProductDetail() {
   const [showMore, setShowMore] = useState(false);
@@ -182,13 +183,14 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
   const { id } = router.query;
+  const {data: session} = useSession();
 
   useEffect(() => {
     const fetchProduct = async () => {
       if (id) {
         try {
           const response = await axios.get(
-            `http://localhost:5000/api/products/products/${id}`
+            `http://localhost:5000/api/products/${id}`
           );
           setProduct(response.data);
         } catch (error) {
@@ -202,10 +204,17 @@ export default function ProductDetail() {
 
   const handleShowMore = () => setShowMore((prev) => !prev);
 
-  const handleAddToCart = () => {
-    console.log("Added to cart:", { product, quantity });
-    alert(`${product.name} has been added to your cart!`);
-  };
+  const addToCart = async (e) => {
+          e.preventDefault();
+          if (!session) return setShowLoginModal(true);
+  
+          try {
+              const response = await axios.post('http://localhost:5000/api/add-to-cart', { productId: product._id, userId: session?.user?._id },);
+              console.log(response.data.message);
+          } catch (error) {
+              console.error('Error adding to cart:', error);
+          }
+      };
 
   const handleQuantityChange = (event) => {
     setQuantity(Math.max(1, parseInt(event.target.value, 10) || 1));
@@ -292,7 +301,7 @@ export default function ProductDetail() {
           {/* Add to Cart Button */}
           <button
             className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-            onClick={handleAddToCart}
+            onClick={addToCart}
             disabled={product.stock === 0}
           >
             Add to Cart

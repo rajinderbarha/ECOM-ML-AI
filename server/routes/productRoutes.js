@@ -3,6 +3,7 @@ import qs from 'qs';
 import Category from "../models/Category.js";
 import uploader from '../utils/cloudinary.js';
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 
 const router = Router();
 
@@ -121,20 +122,29 @@ router.get('/discount-products', async (req, res) => {
 
 router.get('/products-under-price', async (req, res) => {
     try {
-        const { price } = req.query;
-        // if (![500, 1000].includes(Number(price))) {
-        //     return res.status(400).json({ error: 'Invalid price range. Use 500 or 1000.' });
-        // }
+        const { minPrice, maxPrice } = req.query;
 
-        // Find all products where salePrice is less than price
+        // Validate the inputs
+        if (!minPrice || !maxPrice) {
+            return res.status(400).json({ error: 'Both minPrice and maxPrice are required.' });
+        }
+
+        const min = Number(minPrice);
+        const max = Number(maxPrice);
+
+        if (isNaN(min) || isNaN(max) || min < 0 || max < 0 || min > max) {
+            return res.status(400).json({ error: 'Invalid price range. Ensure minPrice and maxPrice are valid numbers, and minPrice is less than maxPrice.' });
+        }
+
+        // Find products where salePrice is between minPrice and maxPrice
         const products = await Product.find({
-            salePrice: { $lt: Number(price) }
+            salePrice: { $gte: min, $lte: max }
         });
 
         // Shuffle the products
         const shuffledProducts = products.sort(() => Math.random() - 0.5);
 
-        // Limit to 8 products per price range
+        // Limit to 10 products per request
         const limitedProducts = shuffledProducts.slice(0, 10);
 
         res.json(limitedProducts);
@@ -143,6 +153,138 @@ router.get('/products-under-price', async (req, res) => {
         res.status(500).json({ error: 'Server error fetching products.' });
     }
 });
+
+router.get('/get-cart', async (req, res) => {
+    const { userId } = req.query;
+    try {
+        const user = await User.findById(userId).populate('cart.product');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({ cart: user.cart });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+router.post('/add-to-cart', async (req, res) => {
+    const { productId, userId } = req.body;
+    if (!productId || !userId) {
+        return res.status(400).json({ message: 'Product ID and User ID are required.' });
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const productExists = user.cart.find(item => item.product.toString() === productId);
+
+        if (productExists) {
+            productExists.quantity += 1;
+        } else {
+            user.cart.push({ product: productId, quantity: 1 });
+        }
+
+        await user.save();
+
+        const populatedCart = await User.findById(userId).populate('cart.product');
+
+        return res.json({ message: 'Product added to cart.', cart: populatedCart.cart });
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        return res.status(500).json({ message: 'Server error.', error: error.message });
+    }
+});
+
+router.post('/remove-from-cart', async (req, res) => {
+    const { productId, userId } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Remove product from the cart
+        user.cart = user.cart.filter(item => item.product.toString() !== productId);
+        await user.save();
+
+        res.status(200).json({ message: 'Product removed from cart' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+})
+
+router.get('/get-wishlist', async (req, res) => {
+    const { userId } = req.query;
+    try {
+        const user = await User.findById(userId).populate('wishlist.product');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({ wishlist: user.wishlist });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+})
+
+
+router.post('/add-to-wishlist', async (req, res) => {
+    const { productId, userId } = req.body;
+    if (!productId || !userId) {
+        return res.status(400).json({ message: 'Product ID and User ID are required.' });
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const productExists = user.wishlist.find(item => item.product.toString() === productId);
+
+        if (productExists) {
+            productExists.quantity += 1;
+        } else {
+            user.wishlist.push({ product: productId, quantity: 1 });
+        }
+
+        await user.save();
+
+        const populatedWishlist = await User.findById(userId).populate('cart.product');
+
+        return res.json({ message: 'Product added to wishlist.', cart: populatedWishlist.wishlist });
+    } catch (error) {
+        console.error('Error adding to wishlist :', error);
+        return res.status(500).json({ message: 'Server error.', error: error.message });
+    }
+});
+
+router.post('/remove-from-wishlist', async (req, res) => {
+    const { productId, userId } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Remove product from the cart
+        user.wishlist = user.wishlist.filter(item => item.product.toString() !== productId);
+        await user.save();
+
+        res.status(200).json({ message: 'Product removed from wishlist' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+})
 
 router.get('/search', async (req, res) => {
     const { search, category, brand, priceRange, inStock } = req.query;

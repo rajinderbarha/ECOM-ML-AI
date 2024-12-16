@@ -12,7 +12,7 @@ export default function CategoryNameList() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/categories/getCategoryNames');
+                const response = await axios.get('http://localhost:5000/api/getCategoryNames');
                 setCategories(response.data);
             } catch (error) {
                 console.error('Error fetching categories:', error);

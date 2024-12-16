@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userSchema = mongoose.Schema(
   {
@@ -7,29 +7,40 @@ const userSchema = mongoose.Schema(
     email: { type: String, unique: true, required: true },
     image: { type: String, default: "" }, // Google profile picture URL
 
+    // Shopping Data
+    cart: [
+      {
+        product: { type: Schema.Types.ObjectId, ref: "Product" },
+        quantity: { type: Number, default: 1 },
+      },
+    ],
+    wishlist: [
+      {
+        product: { type: Schema.Types.ObjectId, ref: "Product" },
+        addedAt: { type: Date, default: Date.now },
+      },
+    ],
+    orderHistory: [{ type: Schema.Types.ObjectId, ref: "Order" }], // List of past orders
+
     // Google Authentication
     googleId: { type: String, unique: true }, // For Google login via NextAuth
     lastLogin: { type: Date, default: Date.now }, // Track last login timestamp
 
     // Personalization Data
-    preferences: { type: [String], default: [] }, // User's preferences (categories, interests, etc.)
-    searchHistory: { type: [String], default: [] }, // List of user search queries
-    likedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }], // Products liked by the user
-    viewedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }], // Recently viewed products
-    recommendedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }], // Recommendations based on history
+    preferences: { type: [String], default: [] },
+    searchHistory: { type: [String], default: [] },
+    likedProducts: [{ type: Schema.Types.ObjectId, ref: "Product" }],
+    viewedProducts: [{ type: Schema.Types.ObjectId, ref: "Product" }],
 
-    // Demographics & Personal Data
+    // Other Details
     familyMembers: { type: Number, default: 1 },
-    dateOfBirth: { type: Date }, // Optional for personalized experiences
-    location: { 
+    dateOfBirth: { type: Date },
+    location: {
       city: { type: String, default: "" },
       country: { type: String, default: "" },
     },
 
-    // Account Data
-    cart: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }], // Current cart items
-    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }], // User wishlist
-    orderHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: "Order" }], // List of past orders
+    // Saved Addresses
     savedAddresses: [
       {
         addressLine1: { type: String },
@@ -44,19 +55,17 @@ const userSchema = mongoose.Schema(
 
     // Notifications and Communication Preferences
     notificationsEnabled: { type: Boolean, default: true },
-    marketingOptIn: { type: Boolean, default: false }, // Consent for marketing emails
-    communicationPreferences: { 
+    marketingOptIn: { type: Boolean, default: false },
+    communicationPreferences: {
       email: { type: Boolean, default: true },
       sms: { type: Boolean, default: false },
     },
 
-    // Analytics
-    sessionCount: { type: Number, default: 0 }, // Track total login sessions
-    referralCode: { type: String }, // Referral code if applicable
-
-    // System Metadata
-    createdAt: { type: Date, default: Date.now }, // Auto-tracked timestamp
-    updatedAt: { type: Date, default: Date.now }, // Updated timestamp
+    // Analytics and Metadata
+    sessionCount: { type: Number, default: 0 },
+    referralCode: { type: String },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

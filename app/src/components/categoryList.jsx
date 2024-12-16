@@ -10,7 +10,7 @@ export default function CategoryList() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/categories/getCategories');
+                const response = await axios.get('http://localhost:5000/api/getCategories');
                 setCategories(response.data);
                 // console.log(response.data);
             } catch (error) {

@@ -6,20 +6,34 @@ import Cart from "./Cart";
 import WishList from "./WishList";
 import { useAppContext } from "@/contexts/AppContext";
 import { useRouter } from "next/router";
+import LoginModal from "./LoginModal";
 
 const Header = () => {
   const { data: session } = useSession();
   const [isAccountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [isCartModalOpen, setCartModalOpen] = useState(false);
   const [isWishlistModalOpen, setWishlistModalOpen] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false)
   const router = useRouter();
   const { searchQuery, setSearchQuery } = useAppContext();
+
   const handleSearch = (e) => {
     e.preventDefault();
     router.push('/search-page?search=' + searchQuery);
 
   };
   const clearSearch = () => setSearchQuery("");
+
+  const showWishlist = () => {
+    if(!session) return setShowLoginModal(true);
+    setWishlistModalOpen(true)
+  }
+
+  const showCart = () => {
+    if(!session) return setShowLoginModal(true);
+    setCartModalOpen(true)
+  }
+
   return (
     <header className="bg-gray-800 text-white py-4 px-6 sticky top-0 left-0 w-full z-[1000]">
       <nav className="flex justify-between items-center">
@@ -63,10 +77,10 @@ const Header = () => {
         </div>
         {/* Icons */}
         <div className="flex items-center gap-6">
-          <button onClick={() => setWishlistModalOpen(true)} className="relative">
+          <button onClick={showWishlist} className="relative">
             <FiHeart className="text-xl" />
           </button>
-          <button onClick={() => setCartModalOpen(true)} className="relative">
+          <button onClick={showCart} className="relative">
             <FiShoppingCart className="text-xl" />
             {/* <p className="card-count absolute top-0 right-0 text-xs bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center">1</p> */}
             <p className="card-count absolute -top-[6px] -right-[8px] text-[10px] leading-none bg-red-500 text-white rounded-full w-[14px] h-[14px] flex items-center justify-center p-[2px]">1</p>
@@ -100,8 +114,9 @@ const Header = () => {
         <Cart setCartModalOpen={setCartModalOpen} />
       )}
       {isWishlistModalOpen && (
-        <WishList setWishlistModalOpen={setWishlistModalOpen} />
+        <WishList setWishlistModalOpen={setWishlistModalOpen} userId={session?.user.id} />
       )}
+      {showLoginModal && (<LoginModal setShowLoginModal={setShowLoginModal}/>)}
     </header>
   );
 };
