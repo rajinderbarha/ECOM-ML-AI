@@ -18,12 +18,20 @@ const SearchPage = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
+      // Prepare query parameters
       const query = new URLSearchParams({
-        ...filters,
         search: search || "",
+        category: filters.category,
+        brand: filters.brand,
+        minPrice: filters.priceRange[0],
+        maxPrice: filters.priceRange[1],
+        inStock: filters.inStock,
       }).toString();
-      const response = await fetch(`http://localhost:5000/api/products/search?${query}`);
+
+      // Fetch products from the backend
+      const response = await fetch(`http://localhost:5000/api/search?${query}`);
       const data = await response.json();
+
       setProducts(data.products);
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -32,8 +40,9 @@ const SearchPage = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [search, filters]);
+  fetchProducts();
+}, [search, filters]);
+
 
   return (
     <div className="flex">
@@ -93,6 +102,13 @@ const SearchPage = () => {
         >
           Apply Filters
         </button>
+        <button
+          onClick={() => setFilters({ category: "", brand: "", priceRange: [0, 1000], inStock: false })}
+          className="bg-gray-500 text-white py-2 px-4 rounded"
+        >
+          Reset Filters
+        </button>
+
       </aside>
 
       {/* Products Section */}
@@ -102,7 +118,7 @@ const SearchPage = () => {
           <p>Loading...</p>
         ) : (
           <div className="grid grid-cols-3 gap-4">
-            {products.map((product) => (
+            {products?.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>

@@ -26,6 +26,6 @@ const ProductSchema = new Schema({
 );
 
 // Adding a text index for searchable fields
-ProductSchema.index({ name: 'text', description: 'text', brand: 'text', categoryName: 'text' });
+ProductSchema.index({ name: 'text', description: 'text', brand: 'text', categoryName: 'text', breadcrumb: 'text' });
 
 export default model('Product', ProductSchema);

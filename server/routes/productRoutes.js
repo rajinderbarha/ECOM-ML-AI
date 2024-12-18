@@ -17,6 +17,7 @@ router.get('/getCategoryNames', async (req, res) => {
         res.status(500).json({ message: 'Error fetching category names', error });
     }
 });
+
 router.get('/getCategories', async (req, res) => {
     try {
         const CategoryList = await Category.find({});
@@ -27,8 +28,6 @@ router.get('/getCategories', async (req, res) => {
         res.status(500).json({ message: 'Error fetching category names', error });
     }
 });
-
-
 
 router.get('/products', async (req, res) => {
     try {
@@ -59,7 +58,6 @@ router.get("/categories", async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 });
-
 
 router.get('/products-by-category', async (req, res) => {
     try {
@@ -167,7 +165,6 @@ router.get('/get-cart', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-
 
 router.post('/add-to-cart', async (req, res) => {
     const { productId, userId } = req.body;
@@ -287,25 +284,41 @@ router.post('/remove-from-wishlist', async (req, res) => {
 })
 
 router.get('/search', async (req, res) => {
-    const { search, category, brand, priceRange, inStock } = req.query;
-    console.log(req.query);
-    const filters = {};
-    if (search) filters.$text = { $search: search };
-    if (category) filters.categoryName = category;
-    if (brand) filters.brand = { $regex: brand, $options: "i" };
-    if (inStock) filters.inStock = inStock === "true";
-    if (priceRange) {
-        const [min, max] = priceRange.split(",").map(Number);
-        filters.price = { $gte: min, $lte: max };
-    }
-
     try {
-        const products = await Product.find(filters).sort({ createdAt: -1 });
-        res.status(200).json({ products });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch products" });
-    }
+        const { search, category, brand, minPrice = 0, maxPrice = 1000, inStock, } = req.query;
+        
+        console.log(search, category, brand, minPrice , maxPrice, inStock,)
+        const filters = {};
 
+        if (search) {
+            filters.$text = { $search: search };
+        }
+
+        if (category) {
+            filters.categoryName = category;
+        }
+
+        // if (brand) {
+        //     filters.brand = { $regex: brand, $options: "i" }; // Case-insensitive match
+        // }
+
+        // if (inStock) {
+        //     filters.inStock = inStock === "true";
+        // }
+
+        // filters.price = { $gte: parseFloat(minPrice), $lte: parseFloat(maxPrice) };
+
+        console.log("filters: ", filters)
+
+        const products = await Product.find(filters);
+
+        // console.log("Searched Products: ", products)
+
+        res.status(200).json({ success: true, products });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
 })
 
 // Add a new product
@@ -344,6 +357,7 @@ router.post('/add-product', uploader.array('images', 5), async (req, res) => {
     }
 });
 
+// Add a new category
 router.post('/add-category', uploader.single('image'), async (req, res) => {
     console.log(req.body);
     try {
