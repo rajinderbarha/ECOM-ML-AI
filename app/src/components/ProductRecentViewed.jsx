@@ -3,15 +3,15 @@ import ProductCard from './ProductCard';
 import Link from 'next/link';
 import { GoChevronLeft, GoChevronRight, GoArrowRight } from 'react-icons/go';
 
-const ProductRecentViewed = () => {
-    const [products50, setProducts50] = useState([]);
+const ProductRecentViewed = ({usedId}) => {
+    const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/discount-products?discount=50')
+        fetch(`http://localhost:5000/api/recent-viewed-products/${usedId}`)
             .then((res) => res.json())
             .then((data) => (
-                // console.log(data),
-                setProducts50(data)
+                console.log(data),
+                setRecentlyViewedProducts(data)
             ))
     }, []);
 
@@ -33,14 +33,6 @@ const ProductRecentViewed = () => {
         scrolingContentElemet.scrollBy({ left: 270, behavior: 'smooth' });
     };
 
-
-    const handleLeftClick2 = () => {
-        scrolingContentElemet2.scrollBy({ left: -270, behavior: 'smooth' });
-    };
-
-    const handleRightClick2 = () => {
-        scrolingContentElemet2.scrollBy({ left: 270, behavior: 'smooth' });
-    };
     return (
         <>
             <section className="  bg-pink-200  py-6">
@@ -55,7 +47,7 @@ const ProductRecentViewed = () => {
                             <button className="absolute scroll-left-btn -left-[15px]  top-1/2 -translate-y-1/2 bg-white text-[26px] rounded-[50%] z-10 shadow-xl" style={{ opacity: '1' }} onClick={handleLeftClick} ref={leftBtn}><GoChevronLeft /></button>
                             <button className="absolute scroll-right-btn -right-[15px] top-1/2 -translate-y-1/2 bg-white text-[26px] rounded-[50%] z-10 shadow-xl" style={{ opacity: '1' }} onClick={handleRightClick} ref={rightBtn}><GoChevronRight /></button>
                             <div className="flex gap-[20px] overflow-x-auto category-list-scroll pb-[30px]" ref={scrolingContent}>
-                                {products50?.map((product) => (
+                                {recentlyViewedProducts?.map((product) => (
                                     <div className="max-w-[250px]">
                                         <ProductCard key={product._id} product={product} />
                                     </div>

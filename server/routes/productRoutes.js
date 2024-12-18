@@ -4,6 +4,7 @@ import Category from "../models/Category.js";
 import uploader from '../utils/cloudinary.js';
 import Product from "../models/Product.js";
 import User from "../models/User.js";
+import Order from "../models/Order.js";
 
 const router = Router();
 
@@ -40,6 +41,7 @@ router.get('/products', async (req, res) => {
 
 router.get('/products/:id', async (req, res) => {
     try {
+        console.log(req.params.id);
         const product = await Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -63,17 +65,22 @@ router.get('/products-by-category', async (req, res) => {
     try {
         const parsedQuery = qs.parse(req.query, { ignoreQueryPrefix: true });
         const categories = parsedQuery.categories;
-        //   console.log("categories",categories);
+
         if (!categories) {
             return res.status(400).json({ error: "Categories parameter is required" });
         }
 
+        // Decode and split categories
         const decodedCategories = decodeURIComponent(categories)
-            .split('|') // Keep existing delimiter
-            .map((cat) => cat.trim());
+            .split('|') // Split by the pipe delimiter
+            .map((cat) => cat.trim())
+            .filter(Boolean); // Remove empty strings
 
-        // console.log("Decoded categories:", decodedCategories);
+        if (decodedCategories.length === 0) {
+            return res.status(400).json({ error: "No valid categories provided" });
+        }
 
+        // Fetch products by category
         const products = await Product.find({ categoryName: { $in: decodedCategories } });
 
         res.status(200).json(products);
@@ -231,7 +238,6 @@ router.get('/get-wishlist', async (req, res) => {
     }
 })
 
-
 router.post('/add-to-wishlist', async (req, res) => {
     const { productId, userId } = req.body;
     if (!productId || !userId) {
@@ -286,8 +292,8 @@ router.post('/remove-from-wishlist', async (req, res) => {
 router.get('/search', async (req, res) => {
     try {
         const { search, category, brand, minPrice = 0, maxPrice = 1000, inStock, } = req.query;
-        
-        console.log(search, category, brand, minPrice , maxPrice, inStock,)
+
+        console.log(search, category, brand, minPrice, maxPrice, inStock,)
         const filters = {};
 
         if (search) {
@@ -320,6 +326,149 @@ router.get('/search', async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
     }
 })
+
+router.post("/place-order", async (req, res) => {
+    try {
+        const { userId, shippingAddress } = req.body;
+
+        console.log(shippingAddress, userId)
+
+        const user = await User.findById(userId).populate("cart.product");
+
+        if (!user || user.cart.length === 0) {
+            return res.status(400).json({ message: "Cart is empty or user not found" });
+        }
+
+        const totalAmount = user.cart.reduce((total, item) => {
+            return total + item.product.salePrice * item.quantity;
+        }, 0);
+
+        const newOrder = new Order({
+            user: userId,
+            items: user.cart.map(item => ({
+                product: item.product._id,
+                quantity: item.quantity,
+            })),
+            totalAmount,
+            shippingAddress,
+        });
+
+        await newOrder.save();
+
+        // Add order ID to user's order history
+        user.orderHistory.push(newOrder._id);
+        user.cart = []; // Clear the cart
+        await user.save();
+
+        res.status(201).json({ message: "Order placed successfully", order: newOrder });
+    } catch (error) {
+        console.error("Error placing order:", error);
+        res.status(500).json({ message: "Something went wrong", error });
+    }
+});
+
+router.get("/user-orders/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        console.log(userId)
+        const orders = await Order.find({ user: userId })
+            .populate("items.product")
+            .sort({ placedAt: -1 });
+
+        if (!orders || orders.length === 0) {
+            return res.status(400).json([]);
+        }
+
+        res.status(200).json({ orders });
+        return
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ message: "Failed to fetch orders", error });
+    }
+});
+
+router.post('/update-cart', async (req, res) => {
+    const { userId, productId, quantity } = req.body;
+
+    if (quantity < 1) {
+        return res.status(400).json({ message: 'Quantity cannot be less than 1' });
+    }
+
+    try {
+        const user = await User.findById(userId).populate('cart.product'); // Populate product details
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const cartItem = user.cart.find(item => item.product._id.toString() === productId);
+        if (cartItem) {
+            cartItem.quantity = quantity;
+            await user.save();
+
+            // Refetch cart with populated product details
+            const updatedUser = await User.findById(userId).populate('cart.product');
+            return res.status(200).json({ message: 'Cart updated successfully', cart: updatedUser.cart });
+        } else {
+            return res.status(404).json({ message: 'Product not found in cart' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating cart', error });
+    }
+});
+
+router.post('/add-to-recently-viewed/:userId/:productId', async (req, res) => {
+    try {
+        const { userId, productId } = req.params;
+
+        if (!userId || userId === 'undefined') {
+            return res.status(400).json({ error: "Invalid user ID" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" });
+        }
+
+        // Update recently viewed products atomically
+        await User.findByIdAndUpdate(userId, {
+            $pull: { recentlyViewedProducts: productId },
+            $push: {
+                recentlyViewedProducts: {
+                    $each: [productId],
+                    $slice: -10, // Keep only the last 10 items
+                },
+            },
+        });
+
+        res.status(200).json({ message: "Product added to recently viewed" });
+    } catch (error) {
+        console.error("Error adding to recently viewed:", error);
+        res.status(500).json({ error: "Failed to add product to recently viewed" });
+    }
+});
+
+router.get('/recent-viewed-products/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId).populate('recentlyViewedProducts');
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const recentlyViewedProducts = user.recentlyViewedProducts;
+        res.status(200).json(recentlyViewedProducts);
+    } catch (error) {
+        console.error("Error fetching recently viewed products:", error);
+        res.status(500).json({ error: "Failed to fetch recently viewed products" });
+    }
+});
 
 // Add a new product
 router.post('/add-product', uploader.array('images', 5), async (req, res) => {

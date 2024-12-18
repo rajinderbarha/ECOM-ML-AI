@@ -18,8 +18,8 @@ const Home = () => {
       <CategoryNameList />
       <HeroSection />
       <CategoryList />
-      {session ? <ProductRelatedSearch />: ""}
-      {session ? <ProductRecentViewed />: ""}
+      {session ? <ProductRelatedSearch  />: ""}
+      {session ? <ProductRecentViewed  usedId={session?.user.id}/>: ""}
       <DiscountSection/>
       <ProductUnderPriceSection />
       <ProductList />

@@ -20,7 +20,9 @@ const userSchema = mongoose.Schema(
         addedAt: { type: Date, default: Date.now },
       },
     ],
-    orderHistory: [{ type: Schema.Types.ObjectId, ref: "Order" }], // List of past orders
+    orderHistory: [{ type: Schema.Types.ObjectId, ref: "Order" }], // List of past orders  
+
+    recentlyViewedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }], //to track recently viewed products by user
 
     // Google Authentication
     googleId: { type: String, unique: true }, // For Google login via NextAuth

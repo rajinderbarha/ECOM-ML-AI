@@ -96,6 +96,7 @@ const Header = () => {
                 {session ? (
                   <>
                     <p className="px-4 py-2 truncate">{session.user.email}</p>
+                    <a href="/your-orders" className="w-full text-left px-4 py-2 hover:bg-red-500">Your orders</a>
                     <button className="w-full text-left px-4 py-2 hover:bg-red-500" onClick={() => signOut()}>
                       Logout
                     </button>

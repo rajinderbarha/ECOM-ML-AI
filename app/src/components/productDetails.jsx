@@ -1,175 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { useRouter } from "next/router";
-// import axios from "axios";
-// import { Carousel } from "react-responsive-carousel";
-// import "react-responsive-carousel/lib/styles/carousel.min.css";
-// import { AiOutlineHeart, AiFillHeart, AiOutlineShareAlt } from "react-icons/ai";
-// import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
-
-// export default function ProductDetail() {
-//   const [showMore, setShowMore] = useState(false);
-//   const [product, setProduct] = useState(null);
-//   const [isWishlist, setIsWishlist] = useState(false);
-//   const [activeTab, setActiveTab] = useState("description");
-
-//   const router = useRouter();
-//   const { id } = router.query;
-
-//   useEffect(() => {
-//     const fetchProduct = async () => {
-//       if (id) {
-//         try {
-//           const response = await axios.get(
-//             `http://localhost:5000/api/products/products/${id}`
-//           );
-//           setProduct(response.data);
-//         } catch (error) {
-//           console.error("Error fetching product:", error);
-//         }
-//       }
-//     };
-
-//     fetchProduct();
-//   }, [id]);
-
-//   const handleWishlist = () => {
-//     setIsWishlist((prev) => !prev);
-//   };
-
-//   const handleShowMore = () => {
-//     setShowMore((prev) => !prev);
-//   };
-
-//   const renderRatingStars = (rating) => {
-//     const fullStars = Math.floor(rating);
-//     const halfStars = rating % 1 >= 0.5 ? 1 : 0;
-//     const emptyStars = 5 - fullStars - halfStars;
-
-//     return (
-//       <>
-//         {Array(fullStars).fill(<FaStar className="text-yellow-500" />)}
-//         {halfStars > 0 && <FaStarHalfAlt className="text-yellow-500" />}
-//         {Array(emptyStars).fill(<FaRegStar className="text-gray-300" />)}
-//       </>
-//     );
-//   };
-
-//   if (!product) {
-//     return <p>Loading...</p>;
-//   }
-
-//   return (
-//     <div className="container mx-auto p-6">
-//       <div className="text-lg font-bold text-orange-600 py-5 product-detail-breadcrumb">
-//         {product.breadcrumb}
-//       </div>
-
-//       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-//         {/* Image Carousel */}
-//         <Carousel showThumbs={false} autoPlay infiniteLoop className="w-full">
-//           {product.images.map((img, index) => (
-//             <div key={index}>
-//               <img
-//                 src={img}
-//                 alt={product.name}
-//                 className="h-96 w-full object-cover"
-//               />
-//             </div>
-//           ))}
-//         </Carousel>
-
-//         {/* Product Details */}
-//         <div>
-//           <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
-
-//           {/* Ratings */}
-//           <div className="flex items-center my-2">
-//             {renderRatingStars(product.rating || 4.5)}
-//             <span className="ml-2 text-gray-600 text-sm">
-//               ({product.reviewsCount || 120} reviews)
-//             </span>
-//           </div>
-
-//           {/* Price and Stock */}
-//           <div className="flex justify-between items-center my-4">
-//             <span className="text-green-600 font-bold text-2xl product-detail-price-text">
-//               ₹{product.salePrice}
-//             </span>
-//             {product.price && (
-//               <span className="line-through text-gray-500 text-xl product-detail-price-text">
-//                 ₹{product.price}
-//               </span>
-//             )}
-//           </div>
-//           <p className={`text-gray-500 ${product.stock > 0 ? "text-green-500" : "text-red-500"} font-semibold`}>
-//             {product.stock > 0 ? "In Stock" : "Out of Stock"}
-//           </p>
-
-//           {/* Wishlist and Share Buttons */}
-//           <div className="flex items-center space-x-4 my-4">
-//             <button onClick={handleWishlist} className="flex items-center text-gray-600 hover:text-red-500">
-//               {isWishlist ? (
-//                 <AiFillHeart color="" className="text-2xl" />
-//               ) : (
-//                 <AiOutlineHeart className="text-2xl" />
-//               )}
-//               <span className="ml-2">Add to Wishlist</span>
-//             </button>
-//             <button className="flex items-center text-gray-600 hover:text-blue-500">
-//               <AiOutlineShareAlt className="text-2xl" />
-//               <span className="ml-2">Share</span>
-//             </button>
-//           </div>
-
-//           {/* Tabs for Description and Reviews */}
-//           <div className="my-6">
-//             <div className="flex space-x-4 border-b">
-//               <button
-//                 onClick={() => setActiveTab("description")}
-//                 className={`py-2 ${
-//                   activeTab === "description" ? "border-b-2 border-orange-500 text-orange-500" : "text-gray-600"
-//                 }`}
-//               >
-//                 Description
-//               </button>
-//               <button
-//                 onClick={() => setActiveTab("reviews")}
-//                 className={`py-2 ${
-//                   activeTab === "reviews" ? "border-b-2 border-orange-500 text-orange-500" : "text-gray-600"
-//                 }`}
-//               >
-//                 Reviews
-//               </button>
-//             </div>
-//             <div className="mt-4">
-//               {activeTab === "description" && (
-//                 <p className={`text-gray-600 text-sm leading-6`}>
-//                   {product.description}
-//                 </p>
-//               )}
-//               {activeTab === "reviews" && (
-//                 <p className="text-gray-600 text-sm">
-//                   {/* Sample Reviews */}
-//                   User reviews and feedback go here.
-//                 </p>
-//               )}
-//             </div>
-//           </div>
-
-//           {/* Add to Cart */}
-//           <button
-//             className="w-full bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition-all"
-//             disabled={product.stock === 0}
-//           >
-//             Add to Cart
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -183,7 +11,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
   const { id } = router.query;
-  const {data: session} = useSession();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -193,6 +21,11 @@ export default function ProductDetail() {
             `http://localhost:5000/api/products/${id}`
           );
           setProduct(response.data);
+          console.log(response.data);
+          // Add product to recently viewed if user is logged in
+          if (session) {
+            await addToRecentlyViewed(response.data._id);
+          }
         } catch (error) {
           console.error("Error fetching product:", error);
         }
@@ -200,21 +33,43 @@ export default function ProductDetail() {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, session]);
+
+
+  const addToRecentlyViewed = async (productId) => {
+    // if (!session) {
+    //   console.log("User not logged in");
+    //   return; // Don't proceed if there's no session
+    // }
+
+    // try {
+    //   const response = await axios.post(
+    //     `http://localhost:5000/api/add-to-recently-viewed/${session.user.id}/${productId}`
+    //   );
+    //   console.log(response.data.message);
+    // } catch (error) {
+    //   console.error('Error adding to recently viewed:', error);
+    // }
+  };
+
+
 
   const handleShowMore = () => setShowMore((prev) => !prev);
 
   const addToCart = async (e) => {
-          e.preventDefault();
-          if (!session) return setShowLoginModal(true);
-  
-          try {
-              const response = await axios.post('http://localhost:5000/api/add-to-cart', { productId: product._id, userId: session?.user?._id },);
-              console.log(response.data.message);
-          } catch (error) {
-              console.error('Error adding to cart:', error);
-          }
-      };
+    e.preventDefault();
+    if (!session) return setShowLoginModal(true);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/add-to-cart",
+        { productId: product._id, userId: session?.user?.id }
+      );
+      console.log(response.data.message);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
+  };
 
   const handleQuantityChange = (event) => {
     setQuantity(Math.max(1, parseInt(event.target.value, 10) || 1));
@@ -252,9 +107,8 @@ export default function ProductDetail() {
           {/* Description */}
           <div className="relative">
             <p
-              className={`text-gray-600 my-4 text-[16px] leading-[24px] overflow-hidden ${
-                showMore ? "h-auto" : "h-[96px]"
-              }`}
+              className={`text-gray-600 my-4 text-[16px] leading-[24px] overflow-hidden ${showMore ? "h-auto" : "h-[96px]"
+                }`}
             >
               {product.description}
             </p>
@@ -276,9 +130,8 @@ export default function ProductDetail() {
 
           {/* Stock Info */}
           <p
-            className={`${
-              product.stock > 0 ? "text-green-500" : "text-red-500"
-            } font-bold`}
+            className={`${product.stock > 0 ? "text-green-500" : "text-red-500"
+              } font-bold`}
           >
             {product.stock > 0 ? "In Stock" : "Out of Stock"}
           </p>

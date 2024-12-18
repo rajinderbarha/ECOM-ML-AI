@@ -42,6 +42,47 @@ export default function Cart({ setCartModalOpen }) {
     setCheckoutModalOpen(true);
   };
 
+  const handlePlaceOrder = async () => {
+    try {
+      const shippingAddress = {
+        addressLine1: "Dummy adrees",
+        addressLine2: "Dummy 4B",
+        city: "FGS",
+        state: "Punjab",
+        postalCode: "140802",
+        country: "INDIA",
+      };
+
+      const response = await axios.post("http://localhost:5000/api/place-order", {
+        userId: user.id,
+        shippingAddress,
+      });
+
+      alert("Order placed successfully!");
+      setCartItems([]); // Clear cart in UI
+      setCheckoutModalOpen(false); // Close modal
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert("Failed to place the order");
+    }
+  };
+
+  const updateCartQuantity = async (productId, newQuantity) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/update-cart', {
+        userId: user.id,
+        productId,
+        quantity: newQuantity,
+      });
+  
+      setCartItems(response.data.cart); // Update the cart in the UI
+    } catch (error) {
+      console.error('Error updating cart quantity:', error);
+    }
+  };
+  
+
+
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1050]">
@@ -62,15 +103,32 @@ export default function Cart({ setCartModalOpen }) {
                 <div key={item.product._id} className="flex justify-between items-center py-3 px-4 mb-3 bg-gray-100 text-black rounded-lg shadow-md">
                   <div className="flex items-center space-x-4">
                     <img
-                      src={item.product.images[0]}
-                      alt={item.product.name}
+                      src={item?.product.images[0]}
+                      alt={item?.product.name}
                       className="w-16 h-16 object-cover rounded-md"
                     />
                     <div>
                       <h3 className="text-sm truncate">{item.product.name.slice(0, 50)}...</h3>
                       <div className='flex justify-between align-center pt-2 px-3 font-bold'>
                         <p className="text-sm text-gray-500">₹{item.product.salePrice}</p>
-                        <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                        <div className="flex items-center">
+                          <button
+                            onClick={() => updateCartQuantity(item.product._id, item.quantity - 1)}
+                            disabled={item.quantity === 1}
+                            className={`bg-gray-300 text-black px-2 py-1 rounded-l ${item.quantity === 1 ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}
+                          >
+                            -
+                          </button>
+                          <span className="px-4">{item.quantity}</span>
+                          <button
+                            onClick={() => updateCartQuantity(item.product._id, item.quantity + 1)}
+                            className="bg-gray-300 text-black px-2 py-1 rounded-r"
+                          >
+                            +
+                          </button>
+                        </div>
+
                       </div>
                     </div>
                   </div>
@@ -139,10 +197,11 @@ export default function Cart({ setCartModalOpen }) {
               <p className="text-lg font-semibold text-black">Total: ₹{calculateTotal()}</p>
               <button
                 className="bg-green-700 text-white px-4 py-2 rounded"
-                onClick={() => alert('Order Placed!')} // Placeholder action
+                onClick={handlePlaceOrder}
               >
                 Buy
               </button>
+
             </div>
           </div>
         </div>
